@@ -95,3 +95,15 @@ document.getElementById('formRegistrasi').addEventListener('submit', function (e
           }
         });
     };
+
+
+
+
+// ---------- tambahan ----------
+document.getElementById('retakeBtn').onclick = () => {
+  document.getElementById('previewWrap').style.display = 'none';
+  document.getElementById('scanNikBtn').click();
+};
+document.getElementById('useBtn').onclick = () => {
+  document.getElementById('previewWrap').style.display = 'none';
+};
