@@ -73,51 +73,41 @@ document.getElementById('scanNikBtn').addEventListener('click', async () => {
   wrap.append(video, snapBtn); document.body.append(wrap);
 
   // 4. saat tombol ditekan
-  snapBtn.onclick = () => {
-    // 4a. capture & resize biar OCR ringan
-    const canvas = document.createElement('canvas');
-    const ctx    = canvas.getContext('2d');
-    const maxW   = 640;
-    const scale  = maxW / video.videoWidth;
-    canvas.width = maxW;
-    canvas.height= video.videoHeight * scale;
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    stream.getTracks().forEach(t => t.stop());
-    wrap.remove();
+    snapBtn.onclick = () => {
+      // --- capture & resize cepat
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const maxW = 640;
+      const scale = maxW / video.videoWidth;
+      canvas.width = maxW;
+      canvas.height = video.videoHeight * scale;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      stream.getTracks().forEach(t => t.stop());
+      wrap.remove();
 
-    // 4b. crop 25 % bawah (area NIK)
-    const crop = document.createElement('canvas');
-    const cctx = crop.getContext('2d');
-    const h    = canvas.height;
-    crop.width = canvas.width;
-    crop.height= h * 0.25;
-    cctx.drawImage(canvas, 0, h * 0.75, canvas.width, h * 0.25, 0, 0, crop.width, crop.height);
-
-    // 4c. OCR whitelist huruf & angka
-    Tesseract.recognize(crop, 'ind', {
-      tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.: ',
-      logger: () => {}
-    }).then(({ data: { text } }) => {
-      // 4d. cari 15-17 digit di seluruh hasil OCR
-      const bigStr = text.replace(/\D/g,''); // buang non-digit
-      const m = bigStr.match(/\d{15,17}/);
-      if (m) {
-        const raw = m[0];
-        // jika 15 digit → tambah ? di tengah
-        // jika 16 digit → langsung pakai
-        // jika 17 digit → ambil 16 pertama
-        let nik16 = raw.length===16 ? raw :
-                    raw.length===15 ? raw.slice(0,8)+'?'+raw.slice(8) :
-                    raw.slice(0,16);
-        document.getElementById('nik').value = nik16;
-        // beri tahu ada yang perlu dikoreksi
-        if(nik16.includes('?')){
-          alert('NIK otomatis terisi, namun ada digit yang belum jelas (ditandai "?").\nSilakan ganti "?" dengan angka yang benar.');
+      // --- OCR whitelist digit SAJA
+      Tesseract.recognize(canvas, 'ind', {
+        tessedit_char_whitelist: '0123456789',
+        logger: () => {}
+      }).then(({ data: { text } }) => {
+        // ambil 15-17 digit berurutan
+        const m = text.replace(/\D/g, '').match(/\d{15,17}/);
+        if (m) {
+          const nik = m[0].slice(-16);        // pastikan 16 digit
+          document.getElementById('nik').value = nik;
+          // opsional: langsung pindah ke field berikutnya
+          document.getElementById('nama').focus();
+        } else {
+          // gagal → otomatis ulang tanpa klik
+          alert('Scan ulang…');
+          document.getElementById('scanNikBtn').click();
         }
-      } else {
-        alert('16 digit NIK tidak terbaca. Silakan foto ulang.');
-      }
+      }).catch(err => {
+        alert('OCR gagal: ' + err);
+      });
+    };
     }).catch(err => alert('OCR gagal: ' + err));
   };
 });
+
 
