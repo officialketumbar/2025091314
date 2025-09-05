@@ -35,7 +35,7 @@ button {
 /* ===== INPUT: shadow inset abu-abu muda ===== */
 input {
   box-shadow: inset 0 1px 3px rgba(128, 128, 128, 0.35);
-  border: 5px solid #ccc;
+  border: 1px solid #ccc;
   border-radius: 1px;
 }
 
@@ -62,6 +62,7 @@ button:focus {
 #scanNikBtn {
   margin: 2;
 }
+
 
 
 
