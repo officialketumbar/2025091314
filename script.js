@@ -63,71 +63,72 @@ document.getElementById('formRegistrasi').addEventListener('submit', function (e
 // ---------- tambahan ----------
 // ---------- KAMERA + OCR ----------
 document.getElementById('scanNikBtn').onclick = async () => {
-  if (!window.Tesseract) {   // load on-demand (±400 kB gzip)
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+    alert('Maaf, fitur kamera hanya berjalan di HTTPS atau localhost.');
+    return;
+  }
+  if (!window.Tesseract) {
     await import('https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js');
   }
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: 'environment' }   // kamera belakang
-  });
-  const video  = document.createElement('video');
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment' }
+    });
+  } catch (e) {
+    alert('Kamera diblokir atau tidak ada.\n\n' + e);
+    return;
+  }
+
+  const video = document.createElement('video');
   video.srcObject = stream;
+  video.playsInline = true;  // iOS wajib
   video.play();
 
-  // buat dialog sederhana
   const snapBtn = document.createElement('button');
   snapBtn.textContent = '📸 Ambil Foto';
-  const dlg = document.createElement('div');
-  Object.assign(dlg.style, {
-    position:'fixed', inset:0, zIndex:9999,
-    background:'#000', display:'flex',
-    flexDirection:'column', alignItems:'center'
+  const wrap = document.createElement('div');
+  Object.assign(wrap.style, {
+    position: 'fixed', inset: 0, zIndex: 9999,
+    background: '#000', display: 'flex',
+    flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
   });
-  dlg.append(video, snapBtn);
-  document.body.append(dlg);
-    snapBtn.onclick = () => {
-      // --- ambil full frame
-      const canvas = document.getElementById('canvas');
-      const ctx    = canvas.getContext('2d');
-      canvas.width  = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0);
-      stream.getTracks().forEach(t => t.stop());
-      dlg.remove();
+  wrap.append(video, snapBtn);
+  document.body.append(wrap);
 
-      // --- crop 25 % bawah (tempat NIK) → hemat CPU
-      const crop = document.getElementById('cropCanvas');
-      const cctx = crop.getContext('2d');
-      const h    = canvas.height;
-      crop.width  = canvas.width;
-      crop.height = h * 0.25;
-      cctx.drawImage(canvas, 0, h * 0.75, canvas.width, h * 0.25, 0, 0, canvas.width, h * 0.25);
+  snapBtn.onclick = () => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    // Resize ke 640px agar OCR ringan
+    const maxW = 640;
+    const scale = maxW / video.videoWidth;
+    canvas.width = maxW;
+    canvas.height = video.videoHeight * scale;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    stream.getTracks().forEach(t => t.stop());
+    wrap.remove();
 
-      // --- OCR di area sempit
-      Tesseract.recognize(crop, 'ind', { tessedit_char_whitelist: '0123456789' })
-        .then(({ data: { text } }) => {
-          // toleransi 15-17 digit
-          const cand = text.match(/[0-9]{15,17}/);
-          if (cand) {
-            const nik = cand[0].slice(-16);        // ambil 16 digit terakhir
-            document.getElementById('nik').value = nik;
-            document.getElementById('previewWrap').style.display = 'none';
-          } else {
-            // tampilkan pratinjau + tombol ulang
-            document.getElementById('previewWrap').style.display = 'block';
-            document.getElementById('useBtn').style.display = 'none';
-          }
-        });
-    };
+    // Crop 25 % bawah
+    const crop = document.createElement('canvas');
+    const cctx = crop.getContext('2d');
+    const h = canvas.height;
+    crop.width = canvas.width;
+    crop.height = h * 0.25;
+    cctx.drawImage(canvas, 0, h * 0.75, canvas.width, h * 0.25, 0, 0, crop.width, crop.height);
 
-
-
-
-// ---------- tambahan ----------
-document.getElementById('retakeBtn').onclick = () => {
-  document.getElementById('previewWrap').style.display = 'none';
-  document.getElementById('scanNikBtn').click();
+    // OCR whitelist digit only
+    Tesseract.recognize(crop, 'ind', {
+      tessedit_char_whitelist: '0123456789',
+      logger: () => {}
+    }).then(({ data: { text } }) => {
+      const m = text.match(/[0-9]{15,17}/);
+      if (m) {
+        document.getElementById('nik').value = m[0].slice(-16);
+      } else {
+        alert('NIK 16 digit tidak terbaca. Silakan coba foto ulang.\n\nHasil OCR: ' + text);
+      }
+    }).catch(err => {
+      alert('OCR gagal: ' + err);
+    });
+  };
 };
-document.getElementById('useBtn').onclick = () => {
-  document.getElementById('previewWrap').style.display = 'none';
-};
-
