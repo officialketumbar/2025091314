@@ -1,6 +1,6 @@
-const scriptURL = 'https://script.google.com/macros/s/AKfycbwiP8iz0KzA5yWuWyLOEj9cOfX0Pj4ulr7Lp3m99AdmMor401Kh2aQP8JIoONhTrY4GkA/exec';
+const scriptURL = 'https://script.google.com/macros/s/AKfycbwiP8iz0KzA5yWuWyLOEj9cOfX0Pj4ulr7Lp3m99AdmMor401Kh2aQP8JIoONhTrY4GkA/exec'; // GANTI DENGAN URL ANDA
 
-/* ==========  VALIDASI NIK  ========== */
+/* ---------- VALIDASI NIK ---------- */
 const nik    = document.getElementById('nik');
 const errBox = document.getElementById('nikError');
 
@@ -26,7 +26,7 @@ document.querySelector('form')?.addEventListener('submit', e => {
   }
 });
 
-/* ==========  CEK NIK  ========== */
+/* ---------- CEK NIK ---------- */
 function cekNIK() {
   const nikVal = nik.value.trim();
   if (!nikVal) { alert('Masukkan NIK dulu.'); return; }
@@ -53,7 +53,7 @@ function cekNIK() {
     });
 }
 
-/* ==========  SUBMIT  ========== */
+/* ---------- SUBMIT ---------- */
 document.getElementById('formRegistrasi').addEventListener('submit', function (e) {
   e.preventDefault();
 
@@ -87,12 +87,12 @@ document.getElementById('formRegistrasi').addEventListener('submit', function (e
     });
 });
 
-/* ==========  INPUT KEMBALI  ========== */
+/* ---------- INPUT KEMBALI ---------- */
 document.getElementById('btnInputKembali').addEventListener('click', () => {
   location.reload();
 });
 
-/* ==========  SCAN KTP (Tesseract)  ========== */
+/* ---------- SCAN KTP ---------- */
 document.getElementById('scanNikBtn').addEventListener('click', async () => {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     alert('Browser tidak support kamera.\nGunakan Chrome/Safari dan pastikan HTTPS.');
