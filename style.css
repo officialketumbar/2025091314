@@ -1,10 +1,18 @@
+/* ===== VARIABEL WARNA ===== */
+:root {
+  --warna-utama: #007BFF;
+  --warna-gelap: #0056b3;
+}
+
+/* ===== BODY ===== */
 body {
   font-family: Arial, sans-serif;
-  background-color: white;
+  background: #fff;
   margin: 0;
   padding: 0;
 }
 
+/* ===== KONTAINER ===== */
 .container {
   width: 90%;
   max-width: 100%;
@@ -12,27 +20,38 @@ body {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, .1);
 }
 
-input, button {
+/* ===== INPUT & BUTTON (margin rapat) ===== */
+input,
+button {
   width: 100%;
   padding: 10px;
-  margin: 8px 0;
+  margin: 2px;          /* rapat: 2 px atas-bawah-kiri-kanan */
   box-sizing: border-box;
 }
 
+/* ===== BUTTON ===== */
 button {
-  background-color: #007BFF;
-  color: white;
+  background: var(--warna-utama);
+  color: #fff;
   border: none;
   cursor: pointer;
+  transition: background .2s ease-in-out;
 }
 
-button:hover {
-  background-color: #0056b3;
-
+button:hover,
+button:focus {
+  background: var(--warna-gelap);
 }
 
-#scanNikBtn{width:100%;margin-top:6px}
+button:focus {
+  outline: 2px solid var(--warna-gelap);
+  outline-offset: 2px;
+}
 
+/* ===== TOMBOL KHUSUS ===== */
+#scanNikBtn {
+  margin-top: 6px;   /* tetap tambahan sedikit di atas */
+}
