@@ -64,7 +64,7 @@ document.getElementById('formRegistrasi').addEventListener('submit', function (e
   fetch(scriptURL, { method: 'POST', body: payload })
     .then(r => r.text())
     .then(() => {
-      document.getElementById('status').textContent = 'Data berhasil disimpan.';
+      document.getElementById('status').textContent = class="blink-hijau">'Data berhasil disimpan.';
       this.reset();
       document.getElementById('dataLama').style.display = 'none';
     })
@@ -143,3 +143,4 @@ document.getElementById('scanNikBtn').addEventListener('click', async () => {
     }).catch(err => alert('OCR gagal: ' + err));
   };
 });
+
