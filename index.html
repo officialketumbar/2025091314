@@ -10,8 +10,8 @@
   <div class="container">
     <h2>Registrasi Ulang Simposium</h2>
     <form id="formRegistrasi">
-      <label for="nik">NIK:</label>
-      <input type="text" id="nik" maxlength="16" pattern="\d{16}" required autocomplete="off"/>
+      <label>NIK:</label>
+      <input type="text" name="nik" id="nik" maxlength="16" pattern="\d{16}" required autocomplete="off"/>
       <div id="nikError" style="color:#dc3545;font-size:13px;margin-top:2px;display:none">
         Jumlah digit harus 16 digit
       </div>
@@ -24,19 +24,19 @@
       </div>
 
       <label>Nama Lengkap:</label>
-      <input type="text" id="nama" required/>
+      <input type="text" name="nama" id="nama" required/>
 
       <label>Instansi:</label>
-      <input type="text" id="instansi" required/>
+      <input type="text" name="instansi" id="instansi" required/>
 
       <label>Email:</label>
-      <input type="email" id="email" required/>
+      <input type="email" name="email" id="email" required/>
 
       <label>No Telp:</label>
-      <input type="text" id="notelp" required/>
+      <input type="text" name="notelp" id="notelp" required/>
 
       <label>Profesi:</label>
-      <input type="text" id="profesi" required/>
+      <input type="text" name="profesi" id="profesi" required/>
 
       <button type="submit">Submit</button>
       <button type="button" id="btnInputKembali">INPUT KEMBALI</button>
