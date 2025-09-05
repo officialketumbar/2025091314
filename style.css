@@ -20,7 +20,6 @@ body {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, .1);
 }
 
 /* ===== INPUT & BUTTON (margin rapat) ===== */
@@ -53,5 +52,6 @@ button:focus {
 
 /* ===== TOMBOL KHUSUS ===== */
 #scanNikBtn {
-  margin-top: 6px;   /* tetap tambahan sedikit di atas */
+  margin-top: 0px;   /* tetap tambahan sedikit di atas */
 }
+
