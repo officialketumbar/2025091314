@@ -32,6 +32,18 @@ button {
   box-sizing: border-box;
 }
 
+.blink-hijau {
+  color: #28a745;              /* hijau */
+  animation: blink 1.2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }  /* menyala-redup */
+}
+
+
+
 /* ===== INPUT: shadow inset abu-abu muda ===== */
 input {
   box-shadow: inset 0 1px 3px rgba(128, 128, 128, 0.35);
@@ -61,17 +73,6 @@ button:focus {
 /* ===== TOMBOL KHUSUS ===== */
 #scanNikBtn {
   margin: 2;
-}
-
-
-.blink-hijau {
-  color: #28a745;              /* hijau */
-  animation: blink 1.2s infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.35; }  /* menyala-redup */
 }
 
 
