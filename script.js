@@ -1,4 +1,4 @@
-const scriptURL = 'https://script.google.com/macros/s/AKfycbwiP8iz0KzA5yWuWyLOEj9cOfX0Pj4ulr7Lp3m99AdmMor401Kh2aQP8JIoONhTrY4GkA/exec'; // GANTI DENGAN URL ANDA
+const scriptURL = 'https://script.google.com/macros/s/AKfycbxVFjOG6KQ3ya--uQ5FMRxfLUcVo9U5NB4ls6i3U3hM2HLHQDvEOuYN3FMwfOWVk00rzQ/exec'; // GANTI DENGAN URL ANDA
 
 /* ---------- VALIDASI NIK ---------- */
 const nik    = document.getElementById('nik');
@@ -161,3 +161,4 @@ document.getElementById('scanNikBtn').addEventListener('click', async () => {
     }).catch(err => alert('OCR gagal: ' + err));
   };
 });
+
