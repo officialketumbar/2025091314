@@ -61,48 +61,37 @@ document.getElementById('formRegistrasi').addEventListener('submit', function (e
 
 
 // ---------- tambahan ----------
-// ---------- KAMERA + OCR ----------
-document.getElementById('scanNikBtn').onclick = async () => {
-  if (!window.Tesseract) {   // load on-demand (±400 kB gzip)
-    await import('https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js');
-  }
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode: 'environment' }   // kamera belakang
-  });
-  const video  = document.createElement('video');
-  video.srcObject = stream;
-  video.play();
+    snapBtn.onclick = () => {
+      // --- ambil full frame
+      const canvas = document.getElementById('canvas');
+      const ctx    = canvas.getContext('2d');
+      canvas.width  = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+      stream.getTracks().forEach(t => t.stop());
+      dlg.remove();
 
-  // buat dialog sederhana
-  const snapBtn = document.createElement('button');
-  snapBtn.textContent = '📸 Ambil Foto';
-  const dlg = document.createElement('div');
-  Object.assign(dlg.style, {
-    position:'fixed', inset:0, zIndex:9999,
-    background:'#000', display:'flex',
-    flexDirection:'column', alignItems:'center'
-  });
-  dlg.append(video, snapBtn);
-  document.body.append(dlg);
+      // --- crop 25 % bawah (tempat NIK) → hemat CPU
+      const crop = document.getElementById('cropCanvas');
+      const cctx = crop.getContext('2d');
+      const h    = canvas.height;
+      crop.width  = canvas.width;
+      crop.height = h * 0.25;
+      cctx.drawImage(canvas, 0, h * 0.75, canvas.width, h * 0.25, 0, 0, canvas.width, h * 0.25);
 
-  snapBtn.onclick = () => {
-    const canvas = document.getElementById('canvas');
-    const ctx    = canvas.getContext('2d');
-    canvas.width  = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
-    stream.getTracks().forEach(t => t.stop());
-    dlg.remove();
-
-    Tesseract.recognize(canvas, 'ind', {
-      logger: () => {}   // silent
-    }).then(({ data: { text } }) => {
-      const match = text.match(/\b\d{16}\b/);   // tepat 16 digit
-      if (match) {
-        document.getElementById('nik').value = match[0];
-      } else {
-        alert('NIK 16 digit tidak ditemukan. Coba foto ulang.');
-      }
-    });
-  };
-};
+      // --- OCR di area sempit
+      Tesseract.recognize(crop, 'ind', { tessedit_char_whitelist: '0123456789' })
+        .then(({ data: { text } }) => {
+          // toleransi 15-17 digit
+          const cand = text.match(/[0-9]{15,17}/);
+          if (cand) {
+            const nik = cand[0].slice(-16);        // ambil 16 digit terakhir
+            document.getElementById('nik').value = nik;
+            document.getElementById('previewWrap').style.display = 'none';
+          } else {
+            // tampilkan pratinjau + tombol ulang
+            document.getElementById('previewWrap').style.display = 'block';
+            document.getElementById('useBtn').style.display = 'none';
+          }
+        });
+    };
