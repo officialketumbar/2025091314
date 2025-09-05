@@ -26,6 +26,7 @@ function cekNIK() {
       alert('Gagal cek NIK.');
     });
 }
+document.getElementById('dataLama').style.display = 'block';
 
 /* ==========  SUBMIT  ========== */
 document.getElementById('formRegistrasi').addEventListener('submit', function (e) {
@@ -119,3 +120,4 @@ document.getElementById('scanNikBtn').addEventListener('click', async () => {
     }).catch(err => alert('OCR gagal: ' + err));
   };
 });
+
