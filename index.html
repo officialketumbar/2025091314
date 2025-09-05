@@ -10,16 +10,64 @@
   <div class="container">
     <h2>Registrasi Ulang Simposium</h2>
     <form id="formRegistrasi">
-      <label>NIK:</label>
-      <input type="text" id="nik" required />
-      <!-- tambahan input NIK -->
-      <button type="button" id="scanNikBtn">📷 Scan NIK via Kamera</button>
-      <canvas id="canvas" style="display:none;"></canvas>
-      <div id="previewWrap" style="display:none;text-align:center;margin-top:8px">
-      <canvas id="cropCanvas" style="max-width:100%;border:1px solid #ccc"></canvas>
-      <button id="useBtn">✅ Pakai NIK ini</button>
-      <button id="retakeBtn">📷 Ulangi</button>
-      </div><br>
+
+<!-- ===== HTML ===== -->
+<label for="nik">NIK:</label>
+
+<!-- input hanya angka, max 16 -->
+<input type="text"
+       id="nik"
+       maxlength="16"
+       pattern="\d{16}"
+       required
+       autocomplete="off" />
+
+<!-- pesan error (sembunyi dulu) -->
+<div id="nikError" style="color:#dc3545;font-size:13px;margin-top:2px;display:none">
+  Jumlah digit harus 16 digit
+</div>
+
+<button type="button" id="scanNikBtn">📷 Scan NIK via Kamera</button>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+<div id="previewWrap" style="display:none;text-align:center;margin-top:8px">
+  <canvas id="cropCanvas" style="max-width:100%;border:1px solid #ccc"></canvas><br>
+  <button id="useBtn">✅ Pakai NIK ini</button>
+  <button id="retakeBtn">📷 Ulangi</button>
+</div>
+
+<script>
+/* ===== VALIDASI 16 DIGIT ===== */
+const nik       = document.getElementById('nik');
+const errBox    = document.getElementById('nikError');
+
+function cekNik() {
+  const val = nik.value.trim();
+  if (val.length === 0) {          // kosong → tidak usah protes
+    errBox.style.display = 'none';
+    return;
+  }
+  if (!/^\d{16}$/.test(val)) {     // harus 16 angka
+    errBox.style.display = 'block';
+  } else {
+    errBox.style.display = 'none';
+  }
+}
+
+// validasi tiap kali mengetik / paste
+nik.addEventListener('input', cekNik);
+
+// bila form akan disubmit, cegah jika belum 16 digit
+document.querySelector('form')?.addEventListener('submit', e => {
+  if (!/^\d{16}$/.test(nik.value.trim())) {
+    e.preventDefault();   // blokir submit
+    nik.focus();
+    cekNik();             // tampilkan pesan
+  }
+});
+</script>
+      
       <!-- tambahan input NIK -->
 
 
@@ -54,6 +102,7 @@
 </body>
 
 </html>
+
 
 
 
