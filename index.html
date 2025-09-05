@@ -12,12 +12,10 @@
     <form id="formRegistrasi">
       <label>NIK:</label>
       <input type="text" id="nik" required />
-      <!-- letakkan tepat di bawah input NIK -->
-      <div class="nik-tools">
-      <button type="button" id="pasteBtn">📋 Paste dari Clipboard</button>
-      <button type="button" id="camBtn">📷 Foto KTP → OCR</button>
-      <input type="file" id="fileInp" accept="image/*" style="display:none">
-      </div>
+      <!-- tambahan input NIK -->
+      <button type="button" id="scanNikBtn">📷 Scan NIK dari Kamera</button>
+      <canvas id="canvas" style="display:none;"></canvas>
+      <!-- tambahan input NIK -->
 
 
       
@@ -51,3 +49,4 @@
 </body>
 
 </html>
+
