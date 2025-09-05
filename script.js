@@ -98,20 +98,26 @@ document.getElementById('scanNikBtn').addEventListener('click', async () => {
       tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.: ',
       logger: () => {}
     }).then(({ data: { text } }) => {
-      // 4d. cari baris yang ada "NIK" lalu ambil 16 digit
-      const rows = text.split(/\r?\n/);
-      let nik = null;
-      for (let r of rows) {
-        if (/nik/i.test(r)) {
-          const m = r.match(/[0-9]{16}/);
-          if (m) { nik = m[0]; break; }
+      // 4d. cari 15-17 digit di seluruh hasil OCR
+      const bigStr = text.replace(/\D/g,''); // buang non-digit
+      const m = bigStr.match(/\d{15,17}/);
+      if (m) {
+        const raw = m[0];
+        // jika 15 digit → tambah ? di tengah
+        // jika 16 digit → langsung pakai
+        // jika 17 digit → ambil 16 pertama
+        let nik16 = raw.length===16 ? raw :
+                    raw.length===15 ? raw.slice(0,8)+'?'+raw.slice(8) :
+                    raw.slice(0,16);
+        document.getElementById('nik').value = nik16;
+        // beri tahu ada yang perlu dikoreksi
+        if(nik16.includes('?')){
+          alert('NIK otomatis terisi, namun ada digit yang belum jelas (ditandai "?").\nSilakan ganti "?" dengan angka yang benar.');
         }
-      }
-      if (nik) {
-        document.getElementById('nik').value = nik;
       } else {
-        alert('Baris bertuliskan "NIK" + 16 digit tidak ditemukan.\n\nHasil OCR:\n' + text);
+        alert('16 digit NIK tidak terbaca. Silakan foto ulang.');
       }
     }).catch(err => alert('OCR gagal: ' + err));
   };
 });
+
