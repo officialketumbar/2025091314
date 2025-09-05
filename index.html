@@ -1,45 +1,61 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registrasi Ulang Simposium</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div class="container">
     <h2>Registrasi Ulang Simposium</h2>
     <form id="formRegistrasi">
       <label for="nik">NIK:</label>
-      <input type="text" id="nik" maxlength="16" pattern="\d{16}" required autocomplete="off" />
+      <input type="text" id="nik" maxlength="16" pattern="\d{16}" required autocomplete="off"/>
       <div id="nikError" style="color:#dc3545;font-size:13px;margin-top:2px;display:none">
         Jumlah digit harus 16 digit
       </div>
       <button type="button" id="scanNikBtn">📷 Scan NIK via Kamera</button>
-      <button type="button" onclick="cekNIK()">Cek NIK</button>
 
-      <div id="dataLama" style="display:none">
+      <p><button type="button" onclick="cekNIK()">Cek NIK</button></p>
+
+      <div id="dataLama" class="hidden">
         <p class="blink-hijau">Data ditemukan. Silakan lanjutkan jika ingin memperbarui.</p>
       </div>
 
       <label>Nama Lengkap:</label>
-      <input type="text" id="nama" required />
+      <input type="text" id="nama" required/>
 
       <label>Instansi:</label>
-      <input type="text" id="instansi" required />
+      <input type="text" id="instansi" required/>
 
       <label>Email:</label>
-      <input type="email" id="email" required />
+      <input type="email" id="email" required/>
 
       <label>No Telp:</label>
-      <input type="text" id="notelp" required />
+      <input type="text" id="notelp" required/>
 
       <label>Profesi:</label>
-      <input type="text" id="profesi" required />
+      <input type="text" id="profesi" required/>
 
       <button type="submit">Submit</button>
+      <button type="button" id="btnInputKembali">INPUT KEMBALI</button>
+
+      <div id="progressWrap" style="display:none;margin-top:10px">
+        <div id="progressBar"></div>
+      </div>
+      <div id="msgSukses" class="blink-hijau" style="display:none;margin-top:10px">
+        DATA BERHASIL DISIMPAN
+      </div>
     </form>
     <p id="status"></p>
+  </div>
+
+  <canvas id="canvas" style="display:none;"></canvas>
+  <div id="previewWrap" style="display:none;text-align:center;margin-top:8px">
+    <canvas id="cropCanvas" style="max-width:100%;border:1px solid #ccc"></canvas><br>
+    <button id="useBtn">✅ Pakai NIK ini</button>
+    <button id="retakeBtn">📷 Ulangi</button>
   </div>
 
   <script src="script.js"></script>
