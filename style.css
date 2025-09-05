@@ -12,7 +12,7 @@ body {
   padding: 0;
 }
 
-/* ===== KONTAINER ===== */
+/* ===== KONTAINER (tanpa shadow) ===== */
 .container {
   width: 90%;
   max-width: 100%;
@@ -20,6 +20,7 @@ body {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
+  /* box-shadow dihapus */
 }
 
 /* ===== INPUT & BUTTON (margin rapat) ===== */
@@ -27,7 +28,7 @@ input,
 button {
   width: 100%;
   padding: 10px;
-  margin: 2px;          /* rapat: 2 px atas-bawah-kiri-kanan */
+  margin: 1px;          /* semaksimal mungkin; ubah ke 0 jika masih terlalu lebar */
   box-sizing: border-box;
 }
 
@@ -52,6 +53,5 @@ button:focus {
 
 /* ===== TOMBOL KHUSUS ===== */
 #scanNikBtn {
-  margin-top: 0px;   /* tetap tambahan sedikit di atas */
+  margin-top: 1px;   /* rapat pula */
 }
-
