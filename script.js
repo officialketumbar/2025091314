@@ -1,50 +1,46 @@
 const scriptURL = 'https://script.google.com/macros/s/AKfycbwiP8iz0KzA5yWuWyLOEj9cOfX0Pj4ulr7Lp3m99AdmMor401Kh2aQP8JIoONhTrY4GkA/exec';
 
-/* ===== VALIDASI NIK ===== */
-const nikInput = document.getElementById('nik');
-const nikError = document.getElementById('nikError');
+/* ==========  VALIDASI NIK  ========== */
+const nik    = document.getElementById('nik');
+const errBox = document.getElementById('nikError');
 
 function cekNik() {
-  const val = nikInput.value.trim();
+  const val = nik.value.trim();
   if (val.length === 0) {
-    nikError.style.display = 'none';
+    errBox.style.display = 'none';
     return;
   }
   if (!/^\d{16}$/.test(val)) {
-    nikError.style.display = 'block';
+    errBox.style.display = 'block';
   } else {
-    nikError.style.display = 'none';
+    errBox.style.display = 'none';
   }
 }
+nik.addEventListener('input', cekNik);
 
-nikInput.addEventListener('input', cekNik);
-
-document.getElementById('formRegistrasi').addEventListener('submit', function (e) {
-  if (!/^\d{16}$/.test(nikInput.value.trim())) {
+document.querySelector('form')?.addEventListener('submit', e => {
+  if (!/^\d{16}$/.test(nik.value.trim())) {
     e.preventDefault();
-    nikInput.focus();
+    nik.focus();
     cekNik();
   }
 });
 
-/* ===== CEK NIK DARI SERVER ===== */
+/* ==========  CEK NIK  ========== */
 function cekNIK() {
-  const nik = nikInput.value.trim();
-  if (!nik) {
-    alert('Masukkan NIK dulu.');
-    return;
-  }
+  const nikVal = nik.value.trim();
+  if (!nikVal) { alert('Masukkan NIK dulu.'); return; }
 
-  fetch(`${scriptURL}?nik=${nik}`)
+  fetch(`${scriptURL}?nik=${nikVal}`)
     .then(r => r.json())
     .then(data => {
       const box = document.getElementById('dataLama');
       if (data.found) {
         box.style.display = 'block';
-        document.getElementById('nama').value = data.nama;
-        document.getElementById('instansi').value = data.instansi;
-        document.getElementById('email').value = data.email;
-        document.getElementById('notelp').value = data.notelp;
+        document.getElementById('nama').value    = data.nama;
+        document.getElementById('instansi').value= data.instansi;
+        document.getElementById('email').value   = data.email;
+        document.getElementById('notelp').value  = data.notelp;
         document.getElementById('profesi').value = data.profesi;
       } else {
         box.style.display = 'none';
@@ -57,23 +53,46 @@ function cekNIK() {
     });
 }
 
-/* ===== SUBMIT FORM ===== */
+/* ==========  SUBMIT  ========== */
 document.getElementById('formRegistrasi').addEventListener('submit', function (e) {
   e.preventDefault();
+
+  const wrap = document.getElementById('progressWrap');
+  const bar  = document.getElementById('progressBar');
+  const msg  = document.getElementById('msgSukses');
+  wrap.style.display = 'block';
+  bar.style.width = '0%';
+
+  let w = 0;
+  const t = setInterval(() => {
+    w += 3; bar.style.width = w + '%';
+    if (w >= 90) clearInterval(t);
+  }, 30);
+
   const payload = new FormData(this);
   fetch(scriptURL, { method: 'POST', body: payload })
     .then(r => r.text())
     .then(() => {
-      document.getElementById('status').textContent = class="blink-hijau">'Data berhasil disimpan.';
-      this.reset();
-      document.getElementById('dataLama').style.display = 'none';
+      clearInterval(t);
+      bar.style.width = '100%';
+      setTimeout(() => {
+        wrap.style.display = 'none';
+        msg.style.display = 'block';
+      }, 300);
     })
     .catch(() => {
-      document.getElementById('status').textContent = 'Gagal menyimpan.';
+      clearInterval(t);
+      wrap.style.display = 'none';
+      alert('Gagal menyimpan.');
     });
 });
 
-/* ===== SCAN KTP DENGAN KAMERA ===== */
+/* ==========  INPUT KEMBALI  ========== */
+document.getElementById('btnInputKembali').addEventListener('click', () => {
+  location.reload();
+});
+
+/* ==========  SCAN KTP (Tesseract)  ========== */
 document.getElementById('scanNikBtn').addEventListener('click', async () => {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     alert('Browser tidak support kamera.\nGunakan Chrome/Safari dan pastikan HTTPS.');
@@ -106,7 +125,6 @@ document.getElementById('scanNikBtn').addEventListener('click', async () => {
 
   const snapBtn = document.createElement('button');
   snapBtn.textContent = '📸 Ambil Foto';
-
   const wrap = document.createElement('div');
   Object.assign(wrap.style, {
     position: 'fixed', inset: 0, zIndex: 9999,
@@ -118,9 +136,9 @@ document.getElementById('scanNikBtn').addEventListener('click', async () => {
 
   snapBtn.onclick = () => {
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const maxW = 640;
-    const scale = maxW / video.videoWidth;
+    const ctx    = canvas.getContext('2d');
+    const maxW   = 640;
+    const scale  = maxW / video.videoWidth;
     canvas.width = maxW;
     canvas.height = video.videoHeight * scale;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -131,10 +149,10 @@ document.getElementById('scanNikBtn').addEventListener('click', async () => {
       tessedit_char_whitelist: '0123456789',
       logger: () => {}
     }).then(({ data: { text } }) => {
-      const match = text.replace(/\D/g, '').match(/\d{15,17}/);
-      if (match) {
-        const nik = match[0].slice(-16);
-        nikInput.value = nik;
+      const m = text.replace(/\D/g, '').match(/\d{15,17}/);
+      if (m) {
+        const nik = m[0].slice(-16);
+        document.getElementById('nik').value = nik;
         document.getElementById('nama').focus();
       } else {
         alert('Scan ulang…');
@@ -143,4 +161,3 @@ document.getElementById('scanNikBtn').addEventListener('click', async () => {
     }).catch(err => alert('OCR gagal: ' + err));
   };
 });
-
