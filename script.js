@@ -54,3 +54,45 @@ document.getElementById('formRegistrasi').addEventListener('submit', function (e
     });
 
 });
+
+
+
+
+
+
+// ---------- Clipboard ----------
+document.getElementById('pasteBtn').addEventListener('click', async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById('nik').value = text.trim();
+  } catch (e) {
+    alert('Tidak bisa akses clipboard. Pastikan izin diberikan.');
+  }
+});
+
+// ---------- OCR ----------
+document.getElementById('camBtn').addEventListener('click', () => {
+  document.getElementById('fileInp').click();
+});
+
+document.getElementById('fileInp').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // load Tesseract.min.js (ringan, ~400 kB gzip)
+  if (!window.Tesseract) {
+    await import('https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js');
+  }
+
+  const { data: { text } } = await Tesseract.recognize(file, 'ind', {
+    logger: m => console.log(m) // opsional
+  });
+
+  // ambil 16 angka pertama (NIK)
+  const nik = (text.match(/\d{16}/) || [])[0];
+  if (nik) {
+    document.getElementById('nik').value = nik;
+  } else {
+    alert('NIK 16 digit tidak terbaca. Silakan potong ulang atau paste manual.');
+  }
+});
