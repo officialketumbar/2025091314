@@ -1,90 +1,83 @@
+/* ==========  CONFIG  ========== */
 const scriptURL = 'https://script.google.com/macros/s/AKfycbwiP8iz0KzA5yWuWyLOEj9cOfX0Pj4ulr7Lp3m99AdmMor401Kh2aQP8JIoONhTrY4GkA/exec'; // Ganti dengan ID kamu
 
+/* ==========  CEK NIK  ========== */
 function cekNIK() {
-  const nik = document.getElementById('nik').value;
-  if (!nik) {
-    alert("Masukkan NIK terlebih dahulu.");
-    return;
-  }
+  const nik = document.getElementById('nik').value.trim();
+  if (!nik) { alert('Masukkan NIK dulu.'); return; }
 
   fetch(`${scriptURL}?nik=${nik}`)
-    .then(res => res.json())
+    .then(r => r.json())
     .then(data => {
       if (data.found) {
         document.getElementById('dataLama').style.display = 'block';
-        document.getElementById('nama').value = data.nama;
-        document.getElementById('instansi').value = data.instansi;
-        document.getElementById('email').value = data.email;
-        document.getElementById('notelp').value = data.notelp;
+        document.getElementById('nama').value    = data.nama;
+        document.getElementById('instansi').value= data.instansi;
+        document.getElementById('email').value   = data.email;
+        document.getElementById('notelp').value  = data.notelp;
         document.getElementById('profesi').value = data.profesi;
       } else {
         document.getElementById('dataLama').style.display = 'none';
-        alert("Data tidak ditemukan. Silakan isi formulir.");
+        alert('Data tidak ditemukan, silakan isi lengkap.');
       }
     })
     .catch(err => {
-      alert("Terjadi kesalahan saat memeriksa NIK.");
       console.error(err);
+      alert('Gagal cek NIK.');
     });
 }
 
+/* ==========  SUBMIT  ========== */
 document.getElementById('formRegistrasi').addEventListener('submit', function (e) {
   e.preventDefault();
-  const data = {
-    nik: document.getElementById('nik').value,
-    nama: document.getElementById('nama').value,
-    instansi: document.getElementById('instansi').value,
-    email: document.getElementById('email').value,
-    notelp: document.getElementById('notelp').value,
-    profesi: document.getElementById('profesi').value
-  };
-
-  fetch(scriptURL, {
-    method: 'POST',
-    body: new URLSearchParams(data)
-  })
-    .then(res => res.text())
-    .then(msg => {
-      document.getElementById('status').textContent = "Data berhasil disimpan!";
-      document.getElementById('formRegistrasi').reset();
+  const payload = new FormData(this);
+  fetch(scriptURL, { method: 'POST', body: payload })
+    .then(r => r.text())
+    .then(() => {
+      document.getElementById('status').textContent = 'Data berhasil disimpan.';
+      this.reset();
     })
-    .catch(err => {
-      document.getElementById('status').textContent = "Gagal menyimpan data.";
-      console.error(err);
+    .catch(() => {
+      document.getElementById('status').textContent = 'Gagal menyimpan.';
     });
-
 });
 
-
-
-
-
-
-// ---------- tambahan ----------
-// ---------- KAMERA + OCR ----------
-document.getElementById('scanNikBtn').onclick = async () => {
-  if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-    alert('Maaf, fitur kamera hanya berjalan di HTTPS atau localhost.');
+/* ==========  SCAN KTP  ========== */
+document.getElementById('scanNikBtn').addEventListener('click', async () => {
+  /* ---- 0. validasi lingkungan ---- */
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert('Browser tidak support kamera.\nGunakan Chrome/Safari dan pastikan HTTPS.');
     return;
   }
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+    alert('Scan KTP hanya berjalan di HTTPS atau localhost.');
+    return;
+  }
+
+  /* ---- 1. load Tesseract on-demand ---- */
   if (!window.Tesseract) {
     await import('https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js');
   }
+
+  /* ---- 2. buka kamera (belakang dulu, fallback depan) ---- */
   let stream;
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment' }
+      video: { facingMode: { exact: 'environment' } }
     });
   } catch (e) {
-    alert('Kamera diblokir atau tidak ada.\n\n' + e);
-    return;
+    // fallback kamera depan
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user' }
+    });
   }
 
   const video = document.createElement('video');
   video.srcObject = stream;
-  video.playsInline = true;  // iOS wajib
+  video.playsInline = true; // wajib iOS
   video.play();
 
+  /* ---- 3. UI overlay ---- */
   const snapBtn = document.createElement('button');
   snapBtn.textContent = '📸 Ambil Foto';
   const wrap = document.createElement('div');
@@ -96,10 +89,10 @@ document.getElementById('scanNikBtn').onclick = async () => {
   wrap.append(video, snapBtn);
   document.body.append(wrap);
 
+  /* ---- 4. otomatis saat tombol ditekan ---- */
   snapBtn.onclick = () => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    // Resize ke 640px agar OCR ringan
     const maxW = 640;
     const scale = maxW / video.videoWidth;
     canvas.width = maxW;
@@ -108,28 +101,21 @@ document.getElementById('scanNikBtn').onclick = async () => {
     stream.getTracks().forEach(t => t.stop());
     wrap.remove();
 
-    // Crop 25 % bawah
-    const crop = document.createElement('canvas');
-    const cctx = crop.getContext('2d');
-    const h = canvas.height;
-    crop.width = canvas.width;
-    crop.height = h * 0.25;
-    cctx.drawImage(canvas, 0, h * 0.75, canvas.width, h * 0.25, 0, 0, crop.width, crop.height);
-
-    // OCR whitelist digit only
-    Tesseract.recognize(crop, 'ind', {
+    /* OCR whitelist digit SAJA */
+    Tesseract.recognize(canvas, 'ind', {
       tessedit_char_whitelist: '0123456789',
       logger: () => {}
     }).then(({ data: { text } }) => {
-      const m = text.match(/[0-9]{15,17}/);
+      const m = text.replace(/\D/g, '').match(/\d{15,17}/);
       if (m) {
-        document.getElementById('nik').value = m[0].slice(-16);
+        const nik = m[0].slice(-16); // tepat 16 digit
+        document.getElementById('nik').value = nik;
+        document.getElementById('nama').focus(); // langsung lanjut
       } else {
-        alert('NIK 16 digit tidak terbaca. Silakan coba foto ulang.\n\nHasil OCR: ' + text);
+        // gagal → otomatis minta ulang
+        alert('Scan ulang…');
+        document.getElementById('scanNikBtn').click();
       }
-    }).catch(err => {
-      alert('OCR gagal: ' + err);
-    });
+    }).catch(err => alert('OCR gagal: ' + err));
   };
-};
-
+});
