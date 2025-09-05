@@ -1,4 +1,4 @@
-const scriptURL = 'https://script.google.com/macros/s/AKfycby9mtL6LJiasTkP1jNjp6IeRkZrz71e9zU4xCnXrrew_nFEftbnyobP6aSsuvmacQI2Og/exec'; // Ganti dengan ID kamu
+const scriptURL = 'https://script.google.com/macros/s/AKfycbwiP8iz0KzA5yWuWyLOEj9cOfX0Pj4ulr7Lp3m99AdmMor401Kh2aQP8JIoONhTrY4GkA/exec'; // Ganti dengan ID kamu
 
 function cekNIK() {
   const nik = document.getElementById('nik').value;
@@ -52,4 +52,5 @@ document.getElementById('formRegistrasi').addEventListener('submit', function (e
       document.getElementById('status').textContent = "Gagal menyimpan data.";
       console.error(err);
     });
+
 });
