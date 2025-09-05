@@ -12,7 +12,7 @@ body {
   padding: 0;
 }
 
-/* ===== KONTAINER (tanpa shadow) ===== */
+/* ===== KONTAINER ===== */
 .container {
   width: 90%;
   max-width: 95%;
@@ -23,28 +23,15 @@ body {
   box-shadow: none !important;
 }
 
-/* ===== INPUT & BUTTON (margin 0 semua sisi) ===== */
-input,
-button {
+/* ===== INPUT & BUTTON ===== */
+input, button {
   width: 100%;
   padding: 10px;
   margin: 0;
   box-sizing: border-box;
 }
 
-.blink-hijau {
-  color: #28a745;              /* hijau */
-  animation: blink 1.2s infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.35; }  /* menyala-redup */
-}
-
-
-
-/* ===== INPUT: shadow inset abu-abu muda ===== */
+/* ===== INPUT ===== */
 input {
   box-shadow: inset 0 1px 3px rgba(128, 128, 128, 0.35);
   border: 1px solid #ccc;
@@ -70,11 +57,13 @@ button:focus {
   outline-offset: 2px;
 }
 
-/* ===== TOMBOL KHUSUS ===== */
-#scanNikBtn {
-  margin: 2;
+/* ===== BLINK HIJAU ===== */
+.blink-hijau {
+  color: #28a745;
+  animation: blink 1.2s infinite;
 }
 
-/* sembunyi tanpa menyentuh display:none */
-.hidden { visibility:hidden; height:0; overflow:hidden; }
-
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
