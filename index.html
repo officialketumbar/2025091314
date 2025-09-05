@@ -12,6 +12,15 @@
     <form id="formRegistrasi">
       <label>NIK:</label>
       <input type="text" id="nik" required />
+      <!-- letakkan tepat di bawah input NIK -->
+      <div class="nik-tools">
+      <button type="button" id="pasteBtn">📋 Paste dari Clipboard</button>
+      <button type="button" id="camBtn">📷 Foto KTP → OCR</button>
+      <input type="file" id="fileInp" accept="image/*" style="display:none">
+      </div>
+
+
+      
       <button type="button" onclick="cekNIK()">Cek NIK</button>
 
       <div id="dataLama" style="display:none;">
@@ -40,4 +49,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>
