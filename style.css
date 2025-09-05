@@ -34,5 +34,4 @@ button:hover {
 
 }
 
-.nik-tools{display:flex;gap:8px;margin-top:4px}
-.nik-tools button{flex:1;font-size:14px;padding:8px}
+#scanNikBtn{width:100%;margin-top:6px}
