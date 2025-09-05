@@ -150,9 +150,14 @@ document.getElementById('formRegistrasi').addEventListener('submit', function (e
 
 /* ==========  SCAN KTP  ========== */
 document.getElementById('scanNikBtn').addEventListener('click', async () => {
-  // 0. validasi HTTPS
+  /* ---- 0. quick sanity check ---- */
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert('Browser Anda tidak support kamera.\nBuka halaman ini di Chrome/Safari dan pastikan HTTPS.');
+    return;
+  }
   if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-    alert('Fitur kamera butuh HTTPS / localhost.'); return;
+    alert('Scan KTP hanya bisa di HTTPS atau localhost.');
+    return;
   }
   // 1. load Tesseract on-demand
   if (!window.Tesseract) {
@@ -214,6 +219,7 @@ document.getElementById('scanNikBtn').addEventListener('click', async () => {
     }).catch(err => alert('OCR gagal: ' + err));
   };
 });
+
 
 
 
