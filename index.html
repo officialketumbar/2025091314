@@ -13,7 +13,7 @@
 
 <!-- ===== HTML ===== -->
 <label for="nik">NIK:</label>
-<input type="text" id="nik" required />
+
 <!-- input hanya angka, max 16 -->
 <input type="text"
        id="nik"
@@ -72,9 +72,9 @@ document.querySelector('form')?.addEventListener('submit', e => {
 
       <p>
       <button type="button" onclick="cekNIK()">Cek NIK</button>
-  
+
       <div id="dataLama" style="display:none;">
-        <p class="blink-hijau">Data ditemukan. Silakan lanjutkan jika ingin memperbarui.</p>
+        <p>Data ditemukan. Silakan lanjutkan jika ingin memperbarui.</p>
       </div>
       
       <label>Nama Lengkap:</label>
@@ -101,6 +101,7 @@ document.querySelector('form')?.addEventListener('submit', e => {
 </body>
 
 </html>
+
 
 
 
