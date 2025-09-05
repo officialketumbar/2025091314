@@ -16,20 +16,27 @@ body {
 .container {
   width: 90%;
   max-width: 100%;
-  margin: 50px auto;
+  margin: 0 auto;
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  /* box-shadow dihapus */
+  box-shadow: none !important;
 }
 
-/* ===== INPUT & BUTTON (margin rapat) ===== */
+/* ===== INPUT & BUTTON (margin 0 semua sisi) ===== */
 input,
 button {
   width: 100%;
   padding: 10px;
-  margin: 1px;          /* semaksimal mungkin; ubah ke 0 jika masih terlalu lebar */
+  margin: 0;
   box-sizing: border-box;
+}
+
+/* ===== INPUT: shadow inset abu-abu muda ===== */
+input {
+  box-shadow: inset 0 1px 3px rgba(128, 128, 128, 0.35);
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 /* ===== BUTTON ===== */
@@ -53,5 +60,5 @@ button:focus {
 
 /* ===== TOMBOL KHUSUS ===== */
 #scanNikBtn {
-  margin-top: 1px;   /* rapat pula */
+  margin: 0;
 }
