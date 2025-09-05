@@ -75,4 +75,6 @@ button:focus {
   margin: 2;
 }
 
+/* sembunyi tanpa menyentuh display:none */
+.hidden { visibility:hidden; height:0; overflow:hidden; }
 
