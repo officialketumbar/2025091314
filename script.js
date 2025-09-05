@@ -60,39 +60,49 @@ document.getElementById('formRegistrasi').addEventListener('submit', function (e
 
 
 
-// ---------- Clipboard ----------
-document.getElementById('pasteBtn').addEventListener('click', async () => {
-  try {
-    const text = await navigator.clipboard.readText();
-    document.getElementById('nik').value = text.trim();
-  } catch (e) {
-    alert('Tidak bisa akses clipboard. Pastikan izin diberikan.');
-  }
-});
-
-// ---------- OCR ----------
-document.getElementById('camBtn').addEventListener('click', () => {
-  document.getElementById('fileInp').click();
-});
-
-document.getElementById('fileInp').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  // load Tesseract.min.js (ringan, ~400 kB gzip)
-  if (!window.Tesseract) {
+// ---------- tambahan ----------
+// ---------- KAMERA + OCR ----------
+document.getElementById('scanNikBtn').onclick = async () => {
+  if (!window.Tesseract) {   // load on-demand (±400 kB gzip)
     await import('https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js');
   }
-
-  const { data: { text } } = await Tesseract.recognize(file, 'ind', {
-    logger: m => console.log(m) // opsional
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'environment' }   // kamera belakang
   });
+  const video  = document.createElement('video');
+  video.srcObject = stream;
+  video.play();
 
-  // ambil 16 angka pertama (NIK)
-  const nik = (text.match(/\d{16}/) || [])[0];
-  if (nik) {
-    document.getElementById('nik').value = nik;
-  } else {
-    alert('NIK 16 digit tidak terbaca. Silakan potong ulang atau paste manual.');
-  }
-});
+  // buat dialog sederhana
+  const snapBtn = document.createElement('button');
+  snapBtn.textContent = '📸 Ambil Foto';
+  const dlg = document.createElement('div');
+  Object.assign(dlg.style, {
+    position:'fixed', inset:0, zIndex:9999,
+    background:'#000', display:'flex',
+    flexDirection:'column', alignItems:'center'
+  });
+  dlg.append(video, snapBtn);
+  document.body.append(dlg);
+
+  snapBtn.onclick = () => {
+    const canvas = document.getElementById('canvas');
+    const ctx    = canvas.getContext('2d');
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    stream.getTracks().forEach(t => t.stop());
+    dlg.remove();
+
+    Tesseract.recognize(canvas, 'ind', {
+      logger: () => {}   // silent
+    }).then(({ data: { text } }) => {
+      const match = text.match(/\b\d{16}\b/);   // tepat 16 digit
+      if (match) {
+        document.getElementById('nik').value = match[0];
+      } else {
+        alert('NIK 16 digit tidak ditemukan. Coba foto ulang.');
+      }
+    });
+  };
+};
