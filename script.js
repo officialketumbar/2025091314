@@ -61,6 +61,29 @@ document.getElementById('formRegistrasi').addEventListener('submit', function (e
 
 
 // ---------- tambahan ----------
+// ---------- KAMERA + OCR ----------
+document.getElementById('scanNikBtn').onclick = async () => {
+  if (!window.Tesseract) {   // load on-demand (±400 kB gzip)
+    await import('https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js');
+  }
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'environment' }   // kamera belakang
+  });
+  const video  = document.createElement('video');
+  video.srcObject = stream;
+  video.play();
+
+  // buat dialog sederhana
+  const snapBtn = document.createElement('button');
+  snapBtn.textContent = '📸 Ambil Foto';
+  const dlg = document.createElement('div');
+  Object.assign(dlg.style, {
+    position:'fixed', inset:0, zIndex:9999,
+    background:'#000', display:'flex',
+    flexDirection:'column', alignItems:'center'
+  });
+  dlg.append(video, snapBtn);
+  document.body.append(dlg);
     snapBtn.onclick = () => {
       // --- ambil full frame
       const canvas = document.getElementById('canvas');
@@ -107,3 +130,4 @@ document.getElementById('retakeBtn').onclick = () => {
 document.getElementById('useBtn').onclick = () => {
   document.getElementById('previewWrap').style.display = 'none';
 };
+
